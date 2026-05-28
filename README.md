@@ -1,50 +1,119 @@
-# Welcome to your Expo app 👋
+# PhysioHome App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+PhysioHome is a mobile-first home physiotherapy service application built with React Native and Expo. The app is being developed as a healthcare service platform where patients can access physiotherapy care at home, book sessions, view providers, manage bookings, and interact with the service through a clean mobile interface.
 
-## Get started
+This README documents the project setup and development work completed so far. Product documentation and brand guidelines are maintained separately inside the project documentation files and are not repeated here.
 
-1. Install dependencies
+---
 
-   ```bash
-   npm install
-   ```
+## Project Status
 
-2. Start the app
+Current status: **Initial app setup and folder organization**
 
-   ```bash
-   npx expo start
-   ```
+At this stage, the project has been prepared for app development. The default Expo Router starter structure has been cleaned up, the app routing has been reorganized, brand assets have been added, and base project folders have been created for scalable development.
 
-In the output, you'll find options to open the app in a
+---
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Tech Stack
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+The project currently uses:
 
-## Get a fresh project
+- React Native
+- Expo
+- Expo Router
+- TypeScript
+- VS Code
+- Node.js / npm
 
-When you're ready, run:
+Planned project direction includes mobile-first development with structured patient, physiotherapist, and authentication flows.
+
+---
+
+## Prerequisites
+
+Before running this project, ensure the following are installed:
+
+- Node.js LTS
+- npm
+- Git
+- VS Code
+- Expo Go app on your Android or iOS device
+
+Check your Node and npm versions:
 
 ```bash
-npm run reset-project
-```
+node -v
+npm -v
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+Expo Go
 
-## Learn more
+Install Expo Go on your mobile device from the Play Store or App Store. Expo Go is used to preview the app during development.
 
-To learn more about developing your project with Expo, look at the following resources:
+Recommended VS Code Extensions
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Install the following VS Code extensions to make development easier:
 
-## Join the community
+ES7+ React/Redux/React-Native snippets
+Prettier - Code formatter
+ESLint
+React Native Tools
+Material Icon Theme
+GitLens
 
-Join our community of developers creating universal apps.
+Main Dependency File
+For this React Native/Expo project, the main dependency file is: 
+package.json
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+Packages and Dependencies Installed or Prepared So Far
+
+The project was created with Expo, so several core packages already exist through the starter setup.
+
+Expected core dependencies include:
+
+expo
+expo-router
+react
+react-dom
+react-native
+react-native-web
+typescript
+
+Additional recommended packages for this project include:
+
+npm install lucide-react-native
+npx expo install expo-linear-gradient
+npx expo install expo-image
+npx expo install expo-font
+npx expo install react-native-safe-area-context
+npx expo install react-native-screens
+
+project location - physiohome-app
+
+Running the app - npx expo start 
+to clear cache and start npx expo start -c
+
+TypeScript Check
+
+To check for TypeScript errors:
+
+npx tsc --noEmit
+
+Current App Flow
+The app currently follows this basic route flow:
+App opens
+  ↓
+app/index.tsx
+  ↓
+Redirects to onboarding
+  ↓
+app/onboarding.tsx
+  ↓
+Get Started button
+  ↓
+app/patient/home.tsx
+
+Authentication Screens
+app/auth/login.tsx
+app/auth/signup.tsx
+
+# PhysioHome-app
