@@ -117,3 +117,17 @@ app/auth/login.tsx
 app/auth/signup.tsx
 
 # PhysioHome-app
+
+
+Use Convex only for:
+
+Database
+Backend functions
+Real-time app data
+Authentication connection
+Bookings
+Profiles
+Payments 
+
+Backend/database/functions → Convex Cloud
+Authentication → WorkOS AuthKit with Convex integration
