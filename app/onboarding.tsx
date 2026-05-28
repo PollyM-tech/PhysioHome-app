@@ -1,13 +1,6 @@
 import React from "react";
 import { Link } from "expo-router";
-import {
-  SafeAreaView,
-  View,
-  Text,
-  StyleSheet,
-  Pressable,
-  Image,
-} from "react-native";
+import { SafeAreaView, View, Text, Pressable, Image } from "react-native";
 import {
   ShieldCheck,
   House,
@@ -20,53 +13,56 @@ import { colors } from "../constants/colors";
 
 export default function OnboardingScreen() {
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <View style={styles.container}>
+    <SafeAreaView className="flex-1 bg-physio-cream">
+      <View className="flex-1 bg-physio-cream">
         {/* Top Section */}
-        <View style={styles.topRow}>
+        <View className="flex-row items-center justify-between px-6 pt-2">
           <View />
           <Pressable>
-            <Text style={styles.skipText}>Skip</Text>
+            <Text className="text-base font-bold text-physio-teal">Skip</Text>
           </Pressable>
         </View>
 
         {/* Logo */}
-        <View style={styles.logoWrapper}>
+        <View className="mt-2 items-center">
           <Logo width={180} height={70} />
         </View>
 
         {/* Heading */}
-        <View style={styles.textSection}>
-          <Text style={styles.heading}>
+        <View className="mt-2 items-center px-7">
+          <Text className="text-center text-[34px] font-extrabold leading-[40px] text-physio-navy">
             Professional Physiotherapy{" "}
-            <Text style={styles.headingAccent}>at Home</Text>
+            <Text className="text-physio-teal">at Home</Text>
           </Text>
 
-          <Text style={styles.subText}>
+          <Text className="mt-3 max-w-[320px] text-center text-base font-medium leading-6 text-physio-navy/85">
             Book trusted physiotherapists to help you heal, recover and live
             pain-free.
           </Text>
         </View>
 
         {/* Hero Image */}
-        <View style={styles.imageWrapper}>
+        <View className="mt-5 px-[18px]">
           <Image
             source={require("../assets/images/hero.png")}
-            style={styles.heroImage}
+            className="h-[320px] w-full rounded-[22px]"
+            resizeMode="cover"
           />
         </View>
 
         {/* Bottom Card */}
-        <View style={styles.bottomCard}>
-          <View style={styles.featuresRow}>
+        <View className="mt-5 flex-1 rounded-t-[28px] bg-white px-5 pb-5 pt-6">
+          <View className="flex-row justify-between gap-3">
             <FeatureItem
               icon={<ShieldCheck size={28} color={colors.primaryTeal} />}
               label="Verified Experts"
             />
+
             <FeatureItem
               icon={<House size={28} color={colors.primaryTeal} />}
               label="Care at Home"
             />
+
             <FeatureItem
               icon={<CalendarDays size={28} color={colors.primaryTeal} />}
               label="Easy Booking"
@@ -74,25 +70,32 @@ export default function OnboardingScreen() {
           </View>
 
           <Link href="/auth/signup" asChild>
-            <Pressable style={styles.ctaButton}>
-              <Text style={styles.ctaText}>Get Started</Text>
+            <Pressable className="mt-8 h-[58px] flex-row items-center justify-between rounded-[22px] bg-physio-teal px-7">
+              <Text className="text-lg font-extrabold text-white">
+                Get Started
+              </Text>
               <ArrowRight size={24} color={colors.white} />
             </Pressable>
           </Link>
 
-          <View style={styles.loginRow}>
-            <Text style={styles.loginText}>Already have an account? </Text>
+          <View className="mt-5 flex-row items-center justify-center">
+            <Text className="text-[15px] font-medium text-physio-slate">
+              Already have an account?{" "}
+            </Text>
+
             <Link href="/auth/login" asChild>
               <Pressable>
-                <Text style={styles.loginLink}>Log in</Text>
+                <Text className="text-[15px] font-bold text-physio-teal">
+                  Log in
+                </Text>
               </Pressable>
             </Link>
           </View>
 
-          <View style={styles.dotsRow}>
-            <View style={[styles.dot, styles.activeDot]} />
-            <View style={styles.dot} />
-            <View style={styles.dot} />
+          <View className="mt-5 flex-row items-center justify-center gap-2.5">
+            <View className="h-3 w-3 rounded-full bg-physio-teal" />
+            <View className="h-2.5 w-2.5 rounded-full bg-physio-gray" />
+            <View className="h-2.5 w-2.5 rounded-full bg-physio-gray" />
           </View>
         </View>
       </View>
@@ -107,155 +110,14 @@ type FeatureItemProps = {
 
 function FeatureItem({ icon, label }: FeatureItemProps) {
   return (
-    <View style={styles.featureItem}>
-      <View style={styles.iconBox}>{icon}</View>
-      <Text style={styles.featureLabel}>{label}</Text>
+    <View className="flex-1 items-center">
+      <View className="mb-3 h-16 w-16 items-center justify-center rounded-[18px] bg-physio-aqua">
+        {icon}
+      </View>
+
+      <Text className="text-center text-sm font-semibold leading-5 text-physio-navy">
+        {label}
+      </Text>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: colors.softCream,
-  },
-  container: {
-    flex: 1,
-    backgroundColor: colors.softCream,
-  },
-  topRow: {
-    paddingHorizontal: 24,
-    paddingTop: 8,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  skipText: {
-    color: colors.primaryTeal,
-    fontSize: 16,
-    fontWeight: "700",
-  },
-  logoWrapper: {
-    alignItems: "center",
-    marginTop: 10,
-  },
-  textSection: {
-    paddingHorizontal: 28,
-    marginTop: 10,
-    alignItems: "center",
-  },
-  heading: {
-    fontSize: 34,
-    lineHeight: 40,
-    fontWeight: "800",
-    color: colors.primaryNavy,
-    textAlign: "center",
-  },
-  headingAccent: {
-    color: colors.primaryTeal,
-  },
-  subText: {
-    marginTop: 14,
-    fontSize: 16,
-    lineHeight: 24,
-    fontWeight: "500",
-    color: colors.primaryNavy,
-    textAlign: "center",
-    opacity: 0.85,
-    maxWidth: 320,
-  },
-  imageWrapper: {
-    marginTop: 22,
-    paddingHorizontal: 18,
-  },
-  heroImage: {
-    width: "100%",
-    height: 320,
-    borderRadius: 22,
-    resizeMode: "cover",
-  },
-  bottomCard: {
-    flex: 1,
-    backgroundColor: colors.white,
-    marginTop: 18,
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 28,
-    paddingHorizontal: 20,
-    paddingTop: 24,
-    paddingBottom: 20,
-  },
-  featuresRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 10,
-  },
-  featureItem: {
-    flex: 1,
-    alignItems: "center",
-  },
-  iconBox: {
-    width: 64,
-    height: 64,
-    borderRadius: 18,
-    backgroundColor: colors.lightTealTint,
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 12,
-  },
-  featureLabel: {
-    fontSize: 14,
-    lineHeight: 20,
-    fontWeight: "600",
-    color: colors.primaryNavy,
-    textAlign: "center",
-  },
-  ctaButton: {
-    marginTop: 30,
-    height: 58,
-    borderRadius: 22,
-    backgroundColor: colors.primaryTeal,
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 28,
-  },
-  ctaText: {
-    color: colors.white,
-    fontSize: 18,
-    fontWeight: "800",
-  },
-  loginRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 22,
-  },
-  loginText: {
-    fontSize: 15,
-    color: colors.mutedSlate,
-    fontWeight: "500",
-  },
-  loginLink: {
-    fontSize: 15,
-    color: colors.primaryTeal,
-    fontWeight: "700",
-  },
-  dotsRow: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    gap: 10,
-    marginTop: 22,
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 999,
-    backgroundColor: colors.lightGray,
-  },
-  activeDot: {
-    width: 12,
-    height: 12,
-    backgroundColor: colors.primaryTeal,
-  },
-});
