@@ -84,8 +84,7 @@ export default function OnboardingScreen() {
               />
             </View>
 
-            {/* CTA Button */}
-            <Link href="/auth/signup" asChild>
+            <Link href="/auth/choose-role" asChild>
               <Pressable style={styles.ctaButton}>
                 <View style={{ width: 26 }} />
                 <Text style={styles.ctaText}>Get Started</Text>
