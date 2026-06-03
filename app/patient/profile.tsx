@@ -6,7 +6,9 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  Alert,
 } from "react-native";
+import { router } from "expo-router";
 import {
   ChevronLeft,
   Settings,
@@ -34,6 +36,7 @@ import {
   ChevronRight,
   Heart,
 } from "lucide-react-native";
+import { clearServerSessionCookies } from "@/lib/security/session-client";
 
 // ─── Static Data ─────────────────────────────────────────────────
 const PERSONAL_INFO = [
@@ -99,6 +102,18 @@ const SETTINGS = [
 
 // ─── Main Screen ─────────────────────────────────────────────────
 export default function ProfileScreen() {
+  const handleLogout = async () => {
+    try {
+      await clearServerSessionCookies();
+      router.replace("/auth/login-patient");
+    } catch {
+      Alert.alert(
+        "Sign out unavailable",
+        "We could not sign you out. Please try again.",
+      );
+    }
+  };
+
   return (
     <SafeAreaView style={s.safe}>
       <ScrollView
@@ -277,7 +292,7 @@ export default function ProfileScreen() {
               ))}
 
               {/* Log Out */}
-              <Pressable style={s.logoutRow}>
+              <Pressable style={s.logoutRow} onPress={handleLogout}>
                 <View style={s.settingsLeft}>
                   <LogOut size={18} color="#E53E3E" />
                   <Text style={s.logoutText}>Log Out</Text>

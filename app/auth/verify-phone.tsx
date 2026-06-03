@@ -42,7 +42,7 @@ export default function VerifyPhoneScreen() {
   const [error, setError] = useState("");
   const [verified, setVerified] = useState(false);
 
-  const inputs = useRef<Array<TextInput | null>>([]);
+  const inputs = useRef<(TextInput | null)[]>([]);
 
   const otpValue = code.join("");
   const canVerify = otpValue.length === OTP_LENGTH;

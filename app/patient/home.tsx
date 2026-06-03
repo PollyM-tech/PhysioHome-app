@@ -1,5 +1,4 @@
 import React from "react";
-import { Link } from "expo-router";
 import {
   SafeAreaView,
   View,
@@ -28,8 +27,6 @@ import {
   Home as HomeIcon,
   CalendarCheck,
 } from "lucide-react-native";
-
-import { colors } from "../../constants/colors";
 
 // ─── Static Data ─────────────────────────────────────────────────
 const SERVICES = [

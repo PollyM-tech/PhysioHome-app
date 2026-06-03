@@ -6,6 +6,7 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
+  Alert,
 } from "react-native";
 import { router } from "expo-router";
 import {
@@ -27,6 +28,7 @@ import {
   LogOut,
   ChevronRight,
 } from "lucide-react-native";
+import { clearServerSessionCookies } from "@/lib/security/session-client";
 
 // ─── Section Row ──────────────────────────────────────────────────
 function InfoRow({
@@ -56,6 +58,18 @@ function InfoRow({
 
 // ─── Main Screen ──────────────────────────────────────────────────
 export default function PhysioProfileScreen() {
+  const handleLogout = async () => {
+    try {
+      await clearServerSessionCookies();
+      router.replace("/auth/login-physio");
+    } catch {
+      Alert.alert(
+        "Sign out unavailable",
+        "We could not sign you out. Please try again.",
+      );
+    }
+  };
+
   return (
     <SafeAreaView style={s.safe}>
       <View style={s.phone}>
@@ -227,7 +241,7 @@ export default function PhysioProfileScreen() {
           {/* ── Log Out ── */}
           <Pressable
             style={s.logoutCard}
-            onPress={() => router.replace("/auth/login-physio")}
+            onPress={handleLogout}
           >
             <View style={s.logoutIconWrap}>
               <LogOut size={20} color="#E53E3E" />
