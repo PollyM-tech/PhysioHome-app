@@ -1,3 +1,4 @@
+import { requestPasswordReset } from "@/lib/auth/client";
 import React, { useState } from "react";
 import {
   SafeAreaView,
@@ -37,23 +38,26 @@ const COLORS = {
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState("");
   const [linkSent, setLinkSent] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
-  const canSend = email.trim().length > 0 && email.includes("@");
+  const canSend = !busy && email.trim().length > 0 && email.includes("@");
 
-  const handleSendResetLink = () => {
+  const handleSendResetLink = async () => {
     if (!canSend) return;
-
-    // Later this will call the real auth provider:
-    // await sendPasswordResetEmail(email.trim());
-    setLinkSent(true);
+    setBusy(true);
+    setError("");
+    try {
+      await requestPasswordReset(email.trim());
+      setLinkSent(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Please try again.");
+    } finally {
+      setBusy(false);
+    }
   };
 
-  const handleResend = () => {
-    if (!canSend) return;
-
-    // Later this will resend the real reset email.
-    setLinkSent(true);
-  };
+  const handleResend = handleSendResetLink;
 
   return (
     <SafeAreaView style={styles.safe}>
@@ -63,6 +67,14 @@ export default function ForgotPasswordScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.container}>
+          {error ? (
+            <Text
+              accessibilityRole="alert"
+              style={{ color: "#B91C1C", marginBottom: 12 }}
+            >
+              {error}
+            </Text>
+          ) : null}
           <Pressable style={styles.backButton} onPress={() => router.back()}>
             <ArrowLeft size={28} color={COLORS.navy} strokeWidth={2.3} />
           </Pressable>
@@ -117,7 +129,9 @@ export default function ForgotPasswordScreen() {
                   disabled={!canSend}
                   onPress={handleSendResetLink}
                 >
-                  <Text style={styles.primaryButtonText}>Send Reset Link</Text>
+                  <Text style={styles.primaryButtonText}>
+                    {busy ? "Sending…" : "Send Reset Link"}
+                  </Text>
                   <Send size={20} color={COLORS.white} strokeWidth={2.4} />
                 </Pressable>
 
@@ -170,7 +184,7 @@ export default function ForgotPasswordScreen() {
               <View style={styles.headingSection}>
                 <Text style={styles.heading}>Check Your Email</Text>
                 <Text style={styles.subheading}>
-                  We sent a password reset link to:
+                  If an eligible account exists, a reset link will be sent to:
                 </Text>
 
                 <View style={styles.emailPill}>
@@ -249,7 +263,11 @@ export default function ForgotPasswordScreen() {
                   </Text>
                 </Pressable>
 
-                <Pressable style={styles.resendButton} onPress={handleResend}>
+                <Pressable
+                  disabled={!canSend}
+                  style={styles.resendButton}
+                  onPress={handleResend}
+                >
                   <RotateCcw size={17} color={COLORS.slate} strokeWidth={2.2} />
                   <Text style={styles.resendText}>Resend Reset Link</Text>
                 </Pressable>

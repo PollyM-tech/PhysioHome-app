@@ -27,17 +27,17 @@
     },
     "plugins": [
       "expo-router",
-      
       [
-  "expo-splash-screen",
-  {
-    "image": "./assets/logo/physiohome-logo.png",
-    "imageWidth": 220,
-    "resizeMode": "contain",
-    "backgroundColor": "#F6ECDD"
-  }
+        "expo-splash-screen",
+        {
+          "image": "./assets/logo/physiohome-logo.png",
+          "imageWidth": 220,
+          "resizeMode": "contain",
+          "backgroundColor": "#F6ECDD"
+        }
       ],
-      "expo-font"
+      "expo-font",
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true,

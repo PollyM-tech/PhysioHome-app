@@ -1,3 +1,4 @@
+import { useAuth } from "@/lib/auth/context";
 import React from "react";
 import {
   SafeAreaView,
@@ -127,6 +128,7 @@ function StepIcon({ type }: { type: string }) {
 
 // ─── Main Screen ─────────────────────────────────────────────────
 export default function PatientHomeScreen() {
+  const { user } = useAuth();
   return (
     <SafeAreaView style={s.safe}>
       <ScrollView
@@ -157,7 +159,7 @@ export default function PatientHomeScreen() {
             {/* Greeting */}
             <View style={s.greetRow}>
               <Text style={s.greetNormal}>Good Morning, </Text>
-              <Text style={s.greetBold}>Pauline</Text>
+              <Text style={s.greetBold}>{user?.full_name.split(" ")[0]}</Text>
               <Text style={s.wave}> 👋</Text>
             </View>
             <Text style={s.greetSub}>How are you feeling today?</Text>

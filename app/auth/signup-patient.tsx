@@ -1,3 +1,4 @@
+import { register } from "@/lib/auth/client";
 import React, { useMemo, useState } from "react";
 import {
   SafeAreaView,
@@ -118,6 +119,8 @@ export default function SignupPatientScreen() {
 
   const [agreed, setAgreed] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const rules = useMemo(
@@ -131,6 +134,7 @@ export default function SignupPatientScreen() {
   );
 
   const canSubmit =
+    !busy &&
     fullName.trim().length > 0 &&
     phone.trim().length > 0 &&
     email.trim().length > 0 &&
@@ -143,11 +147,28 @@ export default function SignupPatientScreen() {
     rules.special &&
     agreed;
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
     if (!canSubmit) return;
-
-    // Temporary route while auth backend is not connected.
-    router.push("/patient/home" as any);
+    setBusy(true);
+    setError("");
+    try {
+      await register({
+        full_name: fullName.trim(),
+        phone: phone.trim(),
+        email: email.trim(),
+        password,
+        role: "patient",
+        agreed_to_terms: agreed,
+      });
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Registration failed. Please try again.",
+      );
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -271,34 +292,26 @@ export default function SignupPatientScreen() {
               </Text>
             </Pressable>
 
+            {error ? (
+              <Text
+                accessibilityRole="alert"
+                style={{ color: "#B91C1C", marginBottom: 12 }}
+              >
+                {error}
+              </Text>
+            ) : null}
             {/* Primary CTA */}
             <Pressable
+              disabled={!canSubmit}
               onPress={handleSignup}
               style={[
                 styles.primaryButton,
                 !canSubmit && styles.primaryButtonDisabled,
               ]}
             >
-              <Text style={styles.primaryButtonText}>Sign Up as Patient</Text>
-            </Pressable>
-
-            {/* Divider */}
-            <View style={styles.dividerRow}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or continue with</Text>
-              <View style={styles.dividerLine} />
-            </View>
-
-            {/* Google */}
-            <Pressable style={styles.socialButton}>
-              <Text style={styles.googleIcon}>G</Text>
-              <Text style={styles.socialButtonText}>Continue with Google</Text>
-            </Pressable>
-
-            {/* Apple */}
-            <Pressable style={styles.socialButton}>
-              <Text style={styles.appleIcon}></Text>
-              <Text style={styles.socialButtonText}>Continue with Apple</Text>
+              <Text style={styles.primaryButtonText}>
+                {busy ? "Creating account…" : "Sign Up as Patient"}
+              </Text>
             </Pressable>
           </View>
 
@@ -308,7 +321,7 @@ export default function SignupPatientScreen() {
 
             <Pressable
               style={styles.loginAction}
-              onPress={() => router.push("/auth/login" as any)}
+              onPress={() => router.push("/auth/login-patient")}
             >
               <Text style={styles.loginLink}>Log In</Text>
               <ChevronRight size={22} color={COLORS.teal} strokeWidth={2.5} />

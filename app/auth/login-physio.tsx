@@ -1,3 +1,4 @@
+import { login } from "@/lib/auth/client";
 import React, { useState } from "react";
 import {
   SafeAreaView,
@@ -38,15 +39,27 @@ export default function LoginPhysioScreen() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
 
-  const canLogin = identifier.trim().length > 0 && password.trim().length > 0;
+  const canLogin =
+    !busy && identifier.trim().length > 0 && password.trim().length > 0;
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
     if (!canLogin) return;
-
-    // Temporary route until real auth is connected.
-    // If your physiotherapist dashboard route is different, change this.
-    router.push("/physiotherapist/dashboard" as any);
+    setBusy(true);
+    setError("");
+    try {
+      await login(identifier.trim(), password, "physiotherapist");
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Sign-in failed. Please try again.",
+      );
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -159,6 +172,14 @@ export default function LoginPhysioScreen() {
               </Pressable>
             </View>
 
+            {error ? (
+              <Text
+                accessibilityRole="alert"
+                style={{ color: "#B91C1C", marginBottom: 12 }}
+              >
+                {error}
+              </Text>
+            ) : null}
             {/* Log In button */}
             <Pressable
               style={[
@@ -168,26 +189,9 @@ export default function LoginPhysioScreen() {
               disabled={!canLogin}
               onPress={handleLogin}
             >
-              <Text style={styles.loginButtonText}>Log In</Text>
-            </Pressable>
-
-            {/* Divider */}
-            <View style={styles.dividerRow}>
-              <View style={styles.dividerLine} />
-              <Text style={styles.dividerText}>or continue with</Text>
-              <View style={styles.dividerLine} />
-            </View>
-
-            {/* Google */}
-            <Pressable style={styles.socialButton}>
-              <Text style={styles.googleIcon}>G</Text>
-              <Text style={styles.socialButtonText}>Continue with Google</Text>
-            </Pressable>
-
-            {/* Apple */}
-            <Pressable style={styles.socialButton}>
-              <Text style={styles.appleIcon}></Text>
-              <Text style={styles.socialButtonText}>Continue with Apple</Text>
+              <Text style={styles.loginButtonText}>
+                {busy ? "Signing in…" : "Log In"}
+              </Text>
             </Pressable>
           </View>
 

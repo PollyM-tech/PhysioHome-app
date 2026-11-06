@@ -28,7 +28,7 @@ import {
   LogOut,
   ChevronRight,
 } from "lucide-react-native";
-import { clearServerSessionCookies } from "@/lib/security/session-client";
+import { useAuth } from "@/lib/auth/context";
 
 // ─── Section Row ──────────────────────────────────────────────────
 function InfoRow({
@@ -58,9 +58,10 @@ function InfoRow({
 
 // ─── Main Screen ──────────────────────────────────────────────────
 export default function PhysioProfileScreen() {
+  const { signOut, user } = useAuth();
   const handleLogout = async () => {
     try {
-      await clearServerSessionCookies();
+      await signOut();
       router.replace("/auth/login-physio");
     } catch {
       Alert.alert(
@@ -90,7 +91,13 @@ export default function PhysioProfileScreen() {
             </Pressable>
             <View style={s.avatarWrap}>
               <View style={s.avatar}>
-                <Text style={s.avatarText}>JM</Text>
+                <Text style={s.avatarText}>
+                  {user?.full_name
+                    .split(" ")
+                    .map((part) => part[0])
+                    .slice(0, 2)
+                    .join("")}
+                </Text>
               </View>
               <View style={s.avatarOnline} />
             </View>
@@ -107,7 +114,13 @@ export default function PhysioProfileScreen() {
             {/* Avatar */}
             <View style={s.profileAvatarWrap}>
               <View style={s.profileAvatar}>
-                <Text style={s.profileAvatarText}>JM</Text>
+                <Text style={s.profileAvatarText}>
+                  {user?.full_name
+                    .split(" ")
+                    .map((part) => part[0])
+                    .slice(0, 2)
+                    .join("")}
+                </Text>
               </View>
               <View style={s.profileOnlineDot} />
             </View>
@@ -116,7 +129,7 @@ export default function PhysioProfileScreen() {
             <View style={s.profileInfo}>
               <View style={s.profileNameRow}>
                 <View style={{ flex: 1 }}>
-                  <Text style={s.profileName}>Dr. James</Text>
+                  <Text style={s.profileName}>{user?.full_name}</Text>
                   <Text style={s.profileRole}>Physiotherapist</Text>
                 </View>
                 <Pressable style={s.editBtn}>
@@ -239,10 +252,7 @@ export default function PhysioProfileScreen() {
           </View>
 
           {/* ── Log Out ── */}
-          <Pressable
-            style={s.logoutCard}
-            onPress={handleLogout}
-          >
+          <Pressable style={s.logoutCard} onPress={handleLogout}>
             <View style={s.logoutIconWrap}>
               <LogOut size={20} color="#E53E3E" />
             </View>

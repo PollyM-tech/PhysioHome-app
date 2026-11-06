@@ -1,0 +1,30 @@
+# Local development only: run from the repository root.
+services:
+  db:
+    image: postgis/postgis:17-3.5
+    env_file: backend/.env
+    ports:
+      - "127.0.0.1:${PHYSIOHOME_DB_PORT:-5433}:5432"
+    volumes:
+      - physiohome_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+  api:
+    build: ./backend
+    env_file: backend/.env
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.development
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+    ports:
+      - "127.0.0.1:${PHYSIOHOME_API_PORT:-8001}:8000"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
+volumes:
+  physiohome_postgres:

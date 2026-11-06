@@ -1,133 +1,76 @@
 # PhysioHome App
 
-PhysioHome is a mobile-first home physiotherapy service application built with React Native and Expo. The app is being developed as a healthcare service platform where patients can access physiotherapy care at home, book sessions, view providers, manage bookings, and interact with the service through a clean mobile interface.
+PhysioHome is a mobile-first healthcare marketplace connecting patients in Kenya with verified physiotherapists for home-based treatment, rehabilitation, and mobility support.
 
-This README documents the project setup and development work completed so far. Product documentation and brand guidelines are maintained separately inside the project documentation files and are not repeated here.
+## Project status
 
----
+The repository contains the Expo mobile app, authentication screens, patient and physiotherapist interfaces, and initial security helpers. Many screens currently use static data.
 
-## Project Status
+The backend architecture has been changed from Convex to **Python and Django**, with **PostgreSQL and PostGIS**. The Django foundation is scaffolded; feature implementation and frontend integration are pending. Convex dependencies and generated scaffolding have been removed from the repository.
 
-Current status: **Initial app setup and folder organization**
+## Languages and frameworks
 
-At this stage, the project has been prepared for app development. The default Expo Router starter structure has been cleaned up, the app routing has been reorganized, brand assets have been added, and base project folders have been created for scalable development.
+| Layer | Language | Framework or service | Status |
+| --- | --- | --- | --- |
+| Mobile app | TypeScript / TSX | React Native 0.81, React 19, Expo SDK 54 | Existing |
+| Navigation | TypeScript | Expo Router 6, built on React Navigation | Existing |
+| Styling | TypeScript and CSS | NativeWind 4 / Tailwind CSS 3, React Native StyleSheet | Existing |
+| Backend API | Python 3.14 | Django 5.2 LTS + Django REST Framework | Scaffolded |
+| Database | SQL | PostgreSQL 17 with PostGIS 3.5 | Local Docker configuration provided |
+| Geographic queries | Python / SQL | GeoDjango + PostGIS | Configured; matching implementation pending |
+| Internal operations | Python | Django Admin | Custom user registered |
+| Authentication | Python / TypeScript | Django passwords + Simple JWT, native SecureStore, browser HTTP-only cookie | Registration, login, recovery, session renewal and guards implemented |
+| Payments | Backend integration | M-Pesa Daraja API | Planned |
+| Maps and routing | Mobile and backend integrations | Google Maps / Places / Routes | Planned; SDK and service selection pending |
+| Notifications | Mobile and backend integrations | Push notifications; delivery integration to be finalized | Planned |
 
----
+Backend Python dependencies are pinned in `backend/requirements.txt`. Backend services are not installed by `npm install`. See [backend setup](backend/README.md) for Docker and native Python instructions.
 
-## Tech Stack
+## Architecture
 
-The project currently uses:
+The Expo app calls a versioned Django REST API for authentication. Django will enforce permissions, provider verification, booking transitions, pricing, payment validation, and administrative workflows. PostgreSQL will store application records; PostGIS will support nearby searches and geographic service coverage.
 
-- React Native
-- Expo
-- Expo Router
-- TypeScript
-- VS Code
-- Node.js / npm
+Device location is obtained by the mobile app with permission. Maps services provide address search, maps, and road travel estimates. PostGIS handles geographic matching; straight-line proximity must not be presented as a driving-time estimate.
 
-Planned project direction includes mobile-first development with structured patient, physiotherapist, and authentication flows.
+See [Technology Stack and Architecture](Docs/TECHNOLOGY_STACK.md) for the current decision, backend organization, proposed API contracts, and migration scope. It supersedes the Convex-specific technical guidance in the original product specification.
 
----
+## Documentation
 
-## Prerequisites
+- [Authentication and authorization](Docs/AUTHENTICATION.md)
+- [Current technology stack and architecture](Docs/TECHNOLOGY_STACK.md)
+- [Product and engineering specification](<Docs/Physio Home Professional App Documentation.pdf>) — includes a backend revision notice; the original specification follows for product context.
+- [Brand guideline](<Docs/Physio Home Brand Guideline.pdf>)
+- [UI references](Docs/UIPages/)
 
-Before running this project, ensure the following are installed:
+The product scope and brand direction remain in effect. Backend examples using Convex are superseded by the current architecture reference.
 
-- Node.js LTS
-- npm
-- Git
-- VS Code
-- Expo Go app on your Android or iOS device
+## Local frontend development
 
-Check your Node and npm versions:
+Prerequisites: Node.js LTS, npm, and an Expo-compatible device or simulator.
 
 ```bash
-node -v
-npm -v
+npm install
+cp .env.example .env.local
+npx expo start
+```
 
-Expo Go
+To clear the Metro cache:
 
-Install Expo Go on your mobile device from the Play Store or App Store. Expo Go is used to preview the app during development.
+```bash
+npx expo start -c
+```
 
-Recommended VS Code Extensions
+Checks:
 
-Install the following VS Code extensions to make development easier:
+```bash
+npm run typecheck
+npm run lint
+```
 
-ES7+ React/Redux/React-Native snippets
-Prettier - Code formatter
-ESLint
-React Native Tools
-Material Icon Theme
-GitLens
+The entry route restores the session and opens the appropriate role area, or onboarding for signed-out users. Authentication routes are under `app/auth`, patient routes under `app/patient`, and provider routes under `app/physiotherapist`.
 
-Main Dependency File
-For this React Native/Expo project, the main dependency file is: 
-package.json
+For the Django API and local PostGIS database, follow [backend setup](backend/README.md). Run the mobile frontend separately.
 
-Packages and Dependencies Installed or Prepared So Far
+## Expo development requirement
 
-The project was created with Expo, so several core packages already exist through the starter setup.
-
-Expected core dependencies include:
-
-expo
-expo-router
-react
-react-dom
-react-native
-react-native-web
-typescript
-
-Additional recommended packages for this project include:
-
-npm install lucide-react-native
-npx expo install expo-linear-gradient
-npx expo install expo-image
-npx expo install expo-font
-npx expo install react-native-safe-area-context
-npx expo install react-native-screens
-
-project location - physiohome-app
-
-Running the app - npx expo start 
-to clear cache and start npx expo start -c
-
-TypeScript Check
-
-To check for TypeScript errors:
-
-npx tsc --noEmit
-
-Current App Flow
-The app currently follows this basic route flow:
-App opens
-  ↓
-app/index.tsx
-  ↓
-Redirects to onboarding
-  ↓
-app/onboarding.tsx
-  ↓
-Get Started button
-  ↓
-app/patient/home.tsx
-
-Authentication Screens
-app/auth/login.tsx
-app/auth/signup.tsx
-
-# PhysioHome-app
-
-
-Use Convex only for:
-
-Database
-Backend functions
-Real-time app data
-Authentication connection
-Bookings
-Profiles
-Payments 
-
-Backend/database/functions → Convex Cloud
-Authentication → WorkOS AuthKit with Convex integration
+Read the exact [Expo SDK 54 documentation](https://docs.expo.dev/versions/v54.0.0/) before changing application code, as required by `AGENTS.md`.

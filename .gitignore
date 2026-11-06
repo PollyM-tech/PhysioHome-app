@@ -42,3 +42,15 @@ app-example
 # generated native folders
 /ios
 /android
+
+# Python / Django
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+backend/.env
+backend/staticfiles/
+backend/media/

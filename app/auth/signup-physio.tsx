@@ -1,3 +1,4 @@
+import { register } from "@/lib/auth/client";
 import React, { useMemo, useState } from "react";
 import {
   SafeAreaView,
@@ -240,6 +241,8 @@ export default function SignupPhysioScreen() {
 
   const [agreed, setAgreed] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const rules = useMemo(
@@ -259,6 +262,7 @@ export default function SignupPhysioScreen() {
     confirmPassword.length > 0 && password !== confirmPassword;
 
   const canSubmit =
+    !busy &&
     fullName.trim().length > 0 &&
     phone.trim().length > 0 &&
     email.trim().length > 0 &&
@@ -271,10 +275,32 @@ export default function SignupPhysioScreen() {
     password === confirmPassword &&
     agreed;
 
-  const handleSignup = () => {
+  const handleSignup = async () => {
     if (!canSubmit) return;
-
-    router.push("/auth/verification-pending" as any);
+    setBusy(true);
+    setError("");
+    try {
+      await register({
+        full_name: fullName.trim(),
+        phone: phone.trim(),
+        email: email.trim(),
+        password,
+        role: "physiotherapist",
+        agreed_to_terms: agreed,
+        license_number: licenseNumber.trim(),
+        specialty,
+        experience,
+        service_area: serviceArea.trim(),
+      });
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Registration failed. Please try again.",
+      );
+    } finally {
+      setBusy(false);
+    }
   };
 
   return (
@@ -467,17 +493,25 @@ export default function SignupPhysioScreen() {
               </Text>
             </Pressable>
 
+            {error ? (
+              <Text
+                accessibilityRole="alert"
+                style={{ color: "#B91C1C", marginBottom: 12 }}
+              >
+                {error}
+              </Text>
+            ) : null}
             {/* Submit */}
             <Pressable
-              onPress={handleSignup}
               disabled={!canSubmit}
+              onPress={handleSignup}
               style={[
                 styles.primaryButton,
                 !canSubmit && styles.primaryButtonDisabled,
               ]}
             >
               <Text style={styles.primaryButtonText}>
-                Sign Up as Physiotherapist
+                {busy ? "Creating account…" : "Sign Up as Physiotherapist"}
               </Text>
             </Pressable>
 
@@ -490,8 +524,8 @@ export default function SignupPhysioScreen() {
                 style={{ marginTop: 1 }}
               />
               <Text style={styles.verificationNoteText}>
-                After signup, your license will be reviewed within 24–48 hours
-                before your profile goes live.
+                Your professional credentials must be reviewed before you can
+                receive bookings. before your profile goes live.
               </Text>
             </View>
           </View>

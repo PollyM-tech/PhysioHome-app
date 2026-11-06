@@ -36,7 +36,7 @@ import {
   ChevronRight,
   Heart,
 } from "lucide-react-native";
-import { clearServerSessionCookies } from "@/lib/security/session-client";
+import { useAuth } from "@/lib/auth/context";
 
 // ─── Static Data ─────────────────────────────────────────────────
 const PERSONAL_INFO = [
@@ -102,9 +102,10 @@ const SETTINGS = [
 
 // ─── Main Screen ─────────────────────────────────────────────────
 export default function ProfileScreen() {
+  const { signOut, user } = useAuth();
   const handleLogout = async () => {
     try {
-      await clearServerSessionCookies();
+      await signOut();
       router.replace("/auth/login-patient");
     } catch {
       Alert.alert(
@@ -138,11 +139,11 @@ export default function ProfileScreen() {
             <View style={s.profileCard}>
               <View style={s.avatarWrap}>
                 <View style={s.avatar}>
-                  <Text style={s.avatarText}>P</Text>
+                  <Text style={s.avatarText}>{user?.full_name[0]}</Text>
                 </View>
               </View>
               <View style={s.profileInfo}>
-                <Text style={s.profileName}>Pauline N.</Text>
+                <Text style={s.profileName}>{user?.full_name}</Text>
                 <View style={s.patientBadge}>
                   <Text style={s.patientBadgeText}>Patient</Text>
                 </View>
@@ -191,7 +192,15 @@ export default function ProfileScreen() {
                   key={i}
                   icon={item.icon}
                   label={item.label}
-                  value={item.value}
+                  value={
+                    item.label === "Full Name"
+                      ? (user?.full_name ?? "")
+                      : item.label === "Phone Number"
+                        ? (user?.phone ?? "")
+                        : item.label === "Email"
+                          ? (user?.email ?? "")
+                          : "Not provided"
+                  }
                   last={i === PERSONAL_INFO.length - 1}
                 />
               ))}
@@ -207,7 +216,15 @@ export default function ProfileScreen() {
                   key={i}
                   icon={item.icon}
                   label={item.label}
-                  value={item.value}
+                  value={
+                    item.label === "Full Name"
+                      ? (user?.full_name ?? "")
+                      : item.label === "Phone Number"
+                        ? (user?.phone ?? "")
+                        : item.label === "Email"
+                          ? (user?.email ?? "")
+                          : "Not provided"
+                  }
                   last={i === CARE_DETAILS.length - 1}
                 />
               ))}

@@ -1,3 +1,4 @@
+import { useAuth } from "@/lib/auth/context";
 import React, { useState } from "react";
 import {
   SafeAreaView,
@@ -100,6 +101,7 @@ const appointments = [
 ];
 
 export default function PhysioHomeScreen() {
+  const { user } = useAuth();
   const [online, setOnline] = useState(true);
 
   return (
@@ -113,7 +115,7 @@ export default function PhysioHomeScreen() {
 
             <View>
               <Text style={styles.headerSub}>Welcome back,</Text>
-              <Text style={styles.headerTitle}>Dr. James 👋</Text>
+              <Text style={styles.headerTitle}>{user?.full_name} 👋</Text>
               <Text style={styles.roleText}>Physiotherapist</Text>
             </View>
           </View>
