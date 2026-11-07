@@ -10,4 +10,5 @@ urlpatterns = [
     path("auth/reset/<uidb64>/<token>/", ResetPasswordConfirmView.as_view(success_url="/auth/reset/done/"), name="password_reset_confirm"),
     path("auth/reset/done/", PasswordResetCompleteView.as_view(template_name="accounts/password_reset_complete.html"), name="password_reset_complete"),
     path("api/v1/", include("apps.core.urls")),
+    path("api/v1/", include("apps.marketplace.urls")),
 ]

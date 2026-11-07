@@ -6,7 +6,7 @@ PhysioHome is a mobile-first healthcare marketplace connecting patients in Kenya
 
 The repository contains the Expo mobile app, authentication screens, patient and physiotherapist interfaces, and initial security helpers. Many screens currently use static data.
 
-The backend architecture has been changed from Convex to **Python and Django**, with **PostgreSQL and PostGIS**. The Django foundation is scaffolded; feature implementation and frontend integration are pending. Convex dependencies and generated scaffolding have been removed from the repository.
+The backend architecture has been changed from Convex to **Python and Django**, with **PostgreSQL and PostGIS**. Authentication, geographic service coverage, availability and initial booking/matching flows are implemented. Payments, push delivery and broader clinical workflows remain pending. Convex dependencies and generated scaffolding have been removed from the repository.
 
 ## Languages and frameworks
 
@@ -17,11 +17,11 @@ The backend architecture has been changed from Convex to **Python and Django**, 
 | Styling | TypeScript and CSS | NativeWind 4 / Tailwind CSS 3, React Native StyleSheet | Existing |
 | Backend API | Python 3.14 | Django 5.2 LTS + Django REST Framework | Scaffolded |
 | Database | SQL | PostgreSQL 17 with PostGIS 3.5 | Local Docker configuration provided |
-| Geographic queries | Python / SQL | GeoDjango + PostGIS | Configured; matching implementation pending |
+| Geographic queries | Python / SQL | GeoDjango + PostGIS | Coverage, discovery and matching implemented |
 | Internal operations | Python | Django Admin | Custom user registered |
 | Authentication | Python / TypeScript | Django passwords + Simple JWT, native SecureStore, browser HTTP-only cookie | Registration, login, recovery, session renewal and guards implemented |
 | Payments | Backend integration | M-Pesa Daraja API | Planned |
-| Maps and routing | Mobile and backend integrations | Google Maps / Places / Routes | Planned; SDK and service selection pending |
+| Maps and routing | Mobile and backend integrations | Native maps, web maps, optional Google Places | Pin/GPS coverage implemented; full search needs configured keys; routing pending |
 | Notifications | Mobile and backend integrations | Push notifications; delivery integration to be finalized | Planned |
 
 Backend Python dependencies are pinned in `backend/requirements.txt`. Backend services are not installed by `npm install`. See [backend setup](backend/README.md) for Docker and native Python instructions.
@@ -36,6 +36,11 @@ See [Technology Stack and Architecture](Docs/TECHNOLOGY_STACK.md) for the curren
 
 ## Documentation
 
+Patients and physiotherapists select up to three services using checkboxes; matching requires the provider to offer all requested services.
+
+The main booking experience is **Find someone available**, with **Choose a physiotherapist** as the alternative. Matching uses approved specialties, confirmed geographic coverage, availability and appointment conflicts.
+
+- [Booking, coverage and matching](Docs/BOOKING_AND_MATCHING.md)
 - [Authentication and authorization](Docs/AUTHENTICATION.md)
 - [Current technology stack and architecture](Docs/TECHNOLOGY_STACK.md)
 - [Product and engineering specification](<Docs/Physio Home Professional App Documentation.pdf>) — includes a backend revision notice; the original specification follows for product context.
@@ -74,3 +79,13 @@ For the Django API and local PostGIS database, follow [backend setup](backend/RE
 ## Expo development requirement
 
 Read the exact [Expo SDK 54 documentation](https://docs.expo.dev/versions/v54.0.0/) before changing application code, as required by `AGENTS.md`.
+
+Keep `babel-preset-expo` on the SDK 54 compatible `~54.0.10` range. A newer SDK's preset can leave private class fields untransformed and prevent Android Hermes builds. After dependency changes, restart Metro with `npx expo start -c`.
+
+Patient feature behavior, API routes, deferred payments and native push setup are documented in [Patient features](Docs/PATIENT_FEATURES.md). After pulling these changes, install dependencies and apply migrations:
+
+```bash
+npm install
+docker compose run --rm api python manage.py migrate
+npx expo start -c
+```

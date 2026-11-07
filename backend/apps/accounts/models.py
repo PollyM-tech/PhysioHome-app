@@ -4,6 +4,9 @@ from django.db.models.functions import Lower
 from django.contrib.auth.models import AbstractUser, UserManager
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.contrib.postgres.fields import ArrayField
+from django.contrib.postgres.indexes import GinIndex
+from apps.marketplace.catalog import SPECIALTIES
 
 
 class AccountManager(UserManager):
@@ -67,12 +70,36 @@ class ProviderApplication(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="provider_application")
     license_number = models.CharField(max_length=100)
     specialty = models.CharField(max_length=120)
+    services = ArrayField(models.CharField(max_length=30, choices=list(SPECIALTIES.items())), default=list, size=3)
+    pricing_tier = models.CharField(max_length=20, blank=True, choices=[("early", "1 to under 3 years"), ("experienced", "3 to under 5 years"), ("senior", "5+ years"), ("consultant", "Approved consultant")])
+    consultant_fee = models.PositiveIntegerField(null=True, blank=True)
+    pricing_reviewed_at = models.DateTimeField(null=True, blank=True)
+    pricing_reviewed_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="reviewed_provider_prices")
     experience = models.CharField(max_length=50)
     service_area = models.CharField(max_length=200)
     verification_status = models.CharField(max_length=20, choices=Status.choices, default=Status.PENDING)
     review_note = models.TextField(blank=True)
     reviewed_by = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL, related_name="reviewed_applications")
     reviewed_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        indexes = [GinIndex(fields=["services"])]
+        constraints = [
+            models.CheckConstraint(condition=models.Q(pricing_tier__in=["", "early", "experienced", "senior", "consultant"]), name="provider_valid_pricing_tier"),
+            models.CheckConstraint(condition=(models.Q(pricing_tier="consultant", consultant_fee__gte=3500, consultant_fee__lte=4500, consultant_fee__isnull=False) | (~models.Q(pricing_tier="consultant") & models.Q(consultant_fee__isnull=True))), name="provider_consultant_rate_range"),
+            models.CheckConstraint(condition=models.Q(services__len__lte=3), name="provider_at_most_three_services"),
+            models.CheckConstraint(condition=models.Q(services__contained_by=list(SPECIALTIES)), name="provider_known_services"),
+        ]
+
+    def clean(self):
+        super().clean()
+        if self.pricing_tier and not self.review_note.strip():
+            raise ValidationError({"review_note": "Record the verified experience or consultant credentials for this rate."})
+        if self.pricing_tier == "consultant":
+            if self.consultant_fee is None or not 3500 <= self.consultant_fee <= 4500:
+                raise ValidationError({"consultant_fee": "Set one exact consultant rate between KES 3,500 and 4,500."})
+        elif self.consultant_fee is not None:
+            raise ValidationError({"consultant_fee": "A custom rate is available only for approved consultants."})
 
     def __str__(self):
         return f"{self.user.full_name}: {self.verification_status}"

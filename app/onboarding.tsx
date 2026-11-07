@@ -1,318 +1,136 @@
 import React from "react";
-import { Link } from "expo-router";
 import {
-  SafeAreaView,
-  View,
-  Text,
   Pressable,
-  ImageBackground,
+  SafeAreaView,
   ScrollView,
   StyleSheet,
+  Text,
+  useWindowDimensions,
+  View,
 } from "react-native";
-import {
-  ShieldCheck,
-  House,
-  CalendarDays,
-  ArrowRight,
-} from "lucide-react-native";
-
-import { Logo } from "../components/common/Logo";
-import { colors } from "../constants/colors";
+import { router } from "expo-router";
+import { ArrowUpRight, ChevronRight } from "lucide-react-native";
+import CareOverview from "@/components/home/CareOverview";
+import { Logo } from "@/components/common/Logo";
+import { useAuth } from "@/lib/auth/context";
 
 export default function OnboardingScreen() {
+  const { width } = useWindowDimensions(),
+    { user } = useAuth();
+  const wide = width >= 900;
+  const begin = (mode: "automatic" | "choose") =>
+    router.push(
+      user?.role === "patient"
+        ? { pathname: "/patient/bookings", params: { mode, service: "" } }
+        : { pathname: "/auth/signup-patient", params: { intent: mode } },
+    );
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={s.safe}>
       <ScrollView
-        style={styles.scroll}
-        contentContainerStyle={styles.scrollContent}
-        bounces={false}
+        contentContainerStyle={s.scroll}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.phoneWrapper}>
-          {/* ── HERO ── */}
-          <ImageBackground
-            source={require("../assets/images/hero.png")}
-            resizeMode="cover"
-            style={styles.hero}
-            imageStyle={styles.heroImage}
-          >
-            <View style={styles.heroOverlay}>
-              {/* Skip */}
-              <View style={styles.skipRow}>
-                <Pressable>
-                  <Text style={styles.skipText}>Skip</Text>
-                </Pressable>
-              </View>
-
-              {/* Logo */}
-              <View style={styles.logoWrap}>
-                <Logo width={180} height={80} />
-              </View>
-
-              {/* Headline */}
-              <View style={styles.headlineWrap}>
-                <Text style={styles.headlineNavy}>
-                  Professional{"\n"}Physiotherapy{"\n"}
-                  <Text style={styles.headlineTeal}>at Home</Text>
-                </Text>
-                <Text style={styles.subtitle}>
-                  Book trusted physiotherapists{"\n"}
-                  to help you heal, recover and{"\n"}
-                  live pain-free.
-                </Text>
-              </View>
+        <View style={[s.shell, wide && s.shellWide]}>
+          <View style={s.header}>
+            <View style={s.brand}>
+              <Logo width={38} height={38} />
+              <Text style={s.wordmark}>
+                Physio<Text style={{ color: "#087F83" }}>Home</Text>
+              </Text>
             </View>
-          </ImageBackground>
-
-          {/* ── BOTTOM CARD ── */}
-          <View style={styles.card}>
-            {/* Feature row */}
-            <View style={styles.featureRow}>
-              <FeatureItem
-                icon={<ShieldCheck size={28} color={colors.primaryTeal} />}
-                label={"Verified\nExperts"}
-              />
-              <View style={styles.divider} />
-              <FeatureItem
-                icon={<House size={28} color={colors.primaryTeal} />}
-                label={"Care at\nHome"}
-              />
-              <View style={styles.divider} />
-              <FeatureItem
-                icon={<CalendarDays size={28} color={colors.primaryTeal} />}
-                label={"Easy\nBooking"}
-              />
-            </View>
-
-            <Link href="/auth/choose-role" asChild>
-              <Pressable style={styles.ctaButton}>
-                <View style={{ width: 26 }} />
-                <Text style={styles.ctaText}>Get Started</Text>
-                <ArrowRight size={26} color="#fff" />
-              </Pressable>
-            </Link>
-
-            {/* Login row */}
-            <View style={styles.loginRow}>
-              <Text style={styles.loginText}>Already have an account? </Text>
-              <Link href="/auth/login-patient" asChild>
-                <Pressable>
-                  <Text style={styles.loginLink}>Log in</Text>
-                </Pressable>
-              </Link>
-            </View>
-
-            {/* Dots */}
-            <View style={styles.dotsRow}>
-              <View style={[styles.dot, styles.dotActive]} />
-              <View style={styles.dot} />
-              <View style={styles.dot} />
-            </View>
-
-            {/* iPhone home indicator */}
-            <View style={styles.homeIndicatorWrap}>
-              <View style={styles.homeIndicator} />
-            </View>
+            <Pressable
+              accessibilityRole="link"
+              onPress={() => router.push("/auth/login-patient")}
+              style={s.login}
+            >
+              <Text style={s.loginText}>Log in</Text>
+              <ChevronRight color="#0B2545" size={16} />
+            </Pressable>
           </View>
+          <View style={[s.hero, wide && s.heroWide]}>
+            <CareOverview
+              onFind={() => begin("automatic")}
+              onChoose={() => begin("choose")}
+            />
+          </View>
+          <View style={s.footer}>
+            <View style={{ flex: 1, gap: 4 }}>
+              <Text style={s.footerTitle}>Are you a physiotherapist?</Text>
+              <Text style={s.footerText}>
+                Set your service area and receive matching requests.
+              </Text>
+            </View>
+            <Pressable
+              accessibilityRole="link"
+              onPress={() => router.push("/auth/signup-physio")}
+              style={s.join}
+            >
+              <Text style={s.joinText}>Join us</Text>
+              <ArrowUpRight color="#087F83" size={17} />
+            </Pressable>
+          </View>
+          <Text style={s.coverage}>
+            Matching depends on provider coverage and availability in your area.
+          </Text>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
-
-type FeatureItemProps = {
-  icon: React.ReactNode;
-  label: string;
-};
-
-function FeatureItem({ icon, label }: FeatureItemProps) {
-  return (
-    <View style={styles.featureItem}>
-      <View style={styles.iconBox}>{icon}</View>
-      <Text style={styles.featureLabel}>{label}</Text>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  scroll: {
-    flex: 1,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    alignItems: "center",
-  },
-
-  phoneWrapper: {
-    width: "100%",
-    maxWidth: 430,
-    backgroundColor: "#F6ECDD",
-    overflow: "hidden",
-  },
-
-  // ── Hero ──
-  hero: {
-    width: "100%",
-    height: 560,
-  },
-  heroImage: {
-    top: -30,
-  },
-  heroOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(246,236,221,0.28)",
-    paddingHorizontal: 24,
-    paddingTop: 16,
-  },
-
-  skipRow: {
-    flexDirection: "row",
-    justifyContent: "flex-end",
-  },
-  skipText: {
-    fontSize: 17,
-    fontWeight: "800",
-    color: "#138A8A",
-  },
-
-  logoWrap: {
-    alignItems: "center",
-    marginTop: 10,
-  },
-
-  headlineWrap: {
-    alignItems: "center",
-    marginTop: 14,
-  },
-  headlineNavy: {
-    textAlign: "center",
-    fontSize: 38,
-    fontWeight: "900",
-    lineHeight: 46,
-    color: "#0B2545",
-  },
-  headlineTeal: {
-    color: "#138A8A",
-  },
-  subtitle: {
-    marginTop: 14,
-    textAlign: "center",
-    fontSize: 18,
-    fontWeight: "500",
-    lineHeight: 27,
-    color: "rgba(11,37,69,0.82)",
-  },
-
-  // ── Card ──
-  card: {
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    backgroundColor: "#fff",
-    paddingHorizontal: 24,
-    paddingTop: 30,
-    paddingBottom: 16,
-    marginTop: -2,
-  },
-
-  featureRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    marginBottom: 30,
-  },
-  featureItem: {
-    flex: 1,
-    alignItems: "center",
-  },
-  iconBox: {
-    width: 64,
-    height: 64,
-    borderRadius: 18,
-    backgroundColor: "#E6F4F4",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 10,
-  },
-  featureLabel: {
-    textAlign: "center",
-    fontSize: 15,
-    fontWeight: "700",
-    lineHeight: 22,
-    color: "#0B2545",
-  },
-  divider: {
-    width: 1,
-    height: 76,
-    backgroundColor: "#E8E8E8",
-    marginTop: 6,
-  },
-
-  // ── CTA ──
-  ctaButton: {
-    height: 62,
-    borderRadius: 22,
-    backgroundColor: "#138A8A",
+const s = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: "#F8F6F0" },
+  scroll: { flexGrow: 1, alignItems: "center" },
+  shell: { width: "100%", maxWidth: 1200, paddingHorizontal: 22 },
+  shellWide: { paddingHorizontal: 44 },
+  header: {
+    minHeight: 76,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    paddingHorizontal: 24,
-    marginBottom: 20,
+    gap: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: "#E4E7DF",
   },
-  ctaText: {
-    fontSize: 22,
+  brand: { flexDirection: "row", alignItems: "center", gap: 4 },
+  wordmark: {
     fontWeight: "800",
-    color: "#fff",
+    fontSize: 21,
+    letterSpacing: -0.7,
+    color: "#0B2545",
   },
-
-  // ── Login ──
-  loginRow: {
+  login: {
+    paddingVertical: 12,
+    paddingLeft: 12,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    marginBottom: 22,
+    gap: 4,
+    minHeight: 44,
   },
-  loginText: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: "#707588",
-  },
-  loginLink: {
-    fontSize: 16,
-    fontWeight: "800",
-    color: "#138A8A",
-  },
-
-  // ── Dots ──
-  dotsRow: {
+  loginText: { fontSize: 14, fontWeight: "700", color: "#0B2545" },
+  hero: { paddingTop: 26, paddingBottom: 22 },
+  heroWide: { paddingTop: 40, paddingBottom: 36 },
+  footer: {
+    borderTopWidth: 1,
+    borderTopColor: "#DCE6E2",
+    paddingVertical: 18,
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
-    marginBottom: 20,
+    gap: 14,
   },
-  dot: {
-    width: 10,
-    height: 10,
-    borderRadius: 5,
-    backgroundColor: "#D5D9DE",
-  },
-  dotActive: {
-    backgroundColor: "#138A8A",
-  },
-
-  // ── Home indicator ──
-  homeIndicatorWrap: {
+  footerTitle: { fontSize: 13, fontWeight: "700", color: "#0B2545" },
+  footerText: { fontSize: 12, lineHeight: 18, color: "#647580" },
+  join: {
+    flexDirection: "row",
+    gap: 5,
     alignItems: "center",
-    paddingBottom: 8,
+    minHeight: 44,
+    paddingLeft: 6,
   },
-  homeIndicator: {
-    width: 130,
-    height: 5,
-    borderRadius: 3,
-    backgroundColor: "#0B2545",
+  joinText: { fontSize: 14, fontWeight: "700", color: "#087F83" },
+  coverage: {
+    fontSize: 11,
+    lineHeight: 17,
+    color: "#647580",
+    paddingBottom: 24,
   },
 });

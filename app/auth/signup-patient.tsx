@@ -9,7 +9,7 @@ import {
   TextInput,
   StyleSheet,
 } from "react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import {
   ArrowLeft,
   User,
@@ -111,6 +111,9 @@ function PasswordRule({ text, met }: { text: string; met: boolean }) {
 }
 
 export default function SignupPatientScreen() {
+  const { intent } = useLocalSearchParams<{ intent?: string }>();
+  const bookingIntent =
+    intent === "automatic" || intent === "choose" ? intent : undefined;
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
@@ -303,6 +306,7 @@ export default function SignupPatientScreen() {
             {/* Primary CTA */}
             <Pressable
               disabled={!canSubmit}
+              accessibilityRole="button"
               onPress={handleSignup}
               style={[
                 styles.primaryButton,
@@ -320,8 +324,15 @@ export default function SignupPatientScreen() {
             <Text style={styles.loginPrompt}>Already have an account?</Text>
 
             <Pressable
+              accessibilityRole="link"
+              accessibilityLabel="Log in instead"
               style={styles.loginAction}
-              onPress={() => router.push("/auth/login-patient")}
+              onPress={() =>
+                router.push({
+                  pathname: "/auth/login-patient",
+                  params: bookingIntent ? { intent: bookingIntent } : {},
+                })
+              }
             >
               <Text style={styles.loginLink}>Log In</Text>
               <ChevronRight size={22} color={COLORS.teal} strokeWidth={2.5} />

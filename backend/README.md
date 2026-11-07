@@ -68,7 +68,7 @@ Django username login is reserved for internal administration. The app uses emai
 
 The custom user has patient, physiotherapist and admin roles. Django Admin requires both staff authorization and the admin role. Superuser creation assigns the admin role. Suspended users must also have `is_active=False`, enforced by model validation and a database constraint. Provider approval uses a separate application and manual review action; account creation does not verify a physiotherapist.
 
-The public registration API creates patient/provider accounts and always starts providers pending review. No public API accepts role changes. Future APIs must enforce object ownership and role-specific permissions. Clinical data, uploads, full document verification, bookings, location models, payments and push delivery are subsequent work. Basic provider approval and Expo authentication integration are implemented.
+The public registration API creates patient/provider accounts and always starts providers pending review. No public API accepts role changes. Future APIs must enforce object ownership and role-specific permissions. Clinical data, uploads, full document verification, payments and push delivery are subsequent work. Geographic coverage, initial booking dispatch and provider acceptance are implemented; see [booking and matching](../Docs/BOOKING_AND_MATCHING.md). Basic provider approval and Expo authentication integration are implemented.
 
 ## Connecting the mobile app
 

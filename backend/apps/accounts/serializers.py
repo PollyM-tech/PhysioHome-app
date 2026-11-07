@@ -10,6 +10,9 @@ from rest_framework import serializers
 from rest_framework.exceptions import AuthenticationFailed
 
 from .models import ProviderApplication, User
+from apps.marketplace.catalog import SPECIALTIES
+from apps.marketplace.serializers import CoverageRegistrationInput, LocationInput, ServiceSelectionField
+from apps.marketplace.models import Coverage
 
 
 def normalize_phone(value):
@@ -30,9 +33,11 @@ class RegisterSerializer(serializers.Serializer):
     role = serializers.ChoiceField(choices=[User.Role.PATIENT, User.Role.PHYSIOTHERAPIST])
     agreed_to_terms = serializers.BooleanField()
     license_number = serializers.CharField(max_length=100, required=False)
-    specialty = serializers.CharField(max_length=120, required=False)
+    services = ServiceSelectionField(required=False)
+    specialty = serializers.ChoiceField(choices=list(SPECIALTIES.values()), required=False)
     experience = serializers.CharField(max_length=50, required=False)
     service_area = serializers.CharField(max_length=200, required=False)
+    coverage = CoverageRegistrationInput(required=False)
     transport = serializers.ChoiceField(choices=["token", "cookie"], default="token")
 
     def validate(self, attrs):
@@ -48,12 +53,21 @@ class RegisterSerializer(serializers.Serializer):
         if User.objects.filter(email__iexact=attrs["email"]).exists() or User.objects.filter(phone=attrs["phone"]).exists():
             raise serializers.ValidationError("An account could not be created with these details. Try signing in or recovering your password.")
         if attrs["role"] == User.Role.PHYSIOTHERAPIST:
-            for field in ("license_number", "specialty", "experience", "service_area"):
+            if "services" not in attrs and attrs.get("specialty"):
+                attrs["services"] = [next(code for code, label in SPECIALTIES.items() if label == attrs["specialty"])]
+            if attrs.get("services"):
+                primary = SPECIALTIES[attrs["services"][0]]
+                if attrs.get("specialty") and attrs["specialty"] != primary:
+                    raise serializers.ValidationError({"services": "The primary specialty must match the selected services."})
+                attrs["specialty"] = primary
+            for field in ("license_number", "services", "experience", "coverage"):
                 if not attrs.get(field):
                     raise serializers.ValidationError({field: "This field is required for physiotherapists."})
         return attrs
 
     def create(self, validated_data):
+        services = validated_data.pop("services", [])
+        coverage = validated_data.pop("coverage", None)
         provider = {key: validated_data.pop(key, "") for key in ("license_number", "specialty", "experience", "service_area")}
         validated_data.pop("agreed_to_terms")
         validated_data.pop("transport")
@@ -61,7 +75,11 @@ class RegisterSerializer(serializers.Serializer):
             with transaction.atomic():
                 user = User.objects.create_user(username=uuid.uuid4().hex, terms_accepted_at=timezone.now(), **validated_data)
                 if user.role == User.Role.PHYSIOTHERAPIST:
-                    ProviderApplication.objects.create(user=user, **provider)
+                    if coverage:
+                        provider["service_area"] = coverage["label"]
+                    ProviderApplication.objects.create(user=user, services=services, **provider)
+                    if coverage:
+                        Coverage.objects.create(user=user, label=coverage["label"], center=LocationInput.point(coverage), radius_km=coverage["radius_km"], availability="offline")
                 return user
         except IntegrityError:
             raise serializers.ValidationError("An account could not be created with these details.")

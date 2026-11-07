@@ -24,6 +24,7 @@ INSTALLED_APPS = [
     "corsheaders",
     "apps.accounts",
     "apps.core",
+    "apps.marketplace",
 ]
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -103,3 +104,23 @@ SESSION_COOKIE_HTTPONLY = True
 SESSION_COOKIE_SAMESITE = "Lax"
 SECURE_CONTENT_TYPE_NOSNIFF = True
 X_FRAME_OPTIONS = "DENY"
+
+GOOGLE_MAPS_API_KEY = env("GOOGLE_MAPS_API_KEY", default="")
+
+# Uploads are served only through the participant-authorized attachment endpoint.
+MEDIA_ROOT = BASE_DIR / "private_uploads"
+DATA_UPLOAD_MAX_MEMORY_SIZE = 8 * 1024 * 1024
+FILE_UPLOAD_MAX_MEMORY_SIZE = 1024 * 1024
+EXPO_PUSH_ACCESS_TOKEN = env("EXPO_PUSH_ACCESS_TOKEN", default="")
+EXPO_PUSH_ENABLED = env.bool("EXPO_PUSH_ENABLED", default=False)
+
+REST_FRAMEWORK["DEFAULT_THROTTLE_RATES"].update({"message_write": "60/min", "patient_write": "30/min"})
+
+# Disabled by default; sandbox must be verified before production enablement.
+MPESA_ENABLED = env.bool("MPESA_ENABLED", default=False)
+MPESA_ENVIRONMENT = env("MPESA_ENVIRONMENT", default="sandbox")
+MPESA_SHORTCODE = env("MPESA_SHORTCODE", default="4125123")
+MPESA_CONSUMER_KEY = env("MPESA_CONSUMER_KEY", default="")
+MPESA_CONSUMER_SECRET = env("MPESA_CONSUMER_SECRET", default="")
+MPESA_PASSKEY = env("MPESA_PASSKEY", default="")
+MPESA_CALLBACK_ORIGIN = env("MPESA_CALLBACK_ORIGIN", default="")

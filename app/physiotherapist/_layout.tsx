@@ -32,6 +32,7 @@ export default function PhysioLayout() {
           },
         }}
       >
+        <Tabs.Screen name="messages" options={{ href: null }} />
         <Tabs.Screen
           name="home"
           options={{

@@ -9,7 +9,7 @@ import {
   TextInput,
   StyleSheet,
 } from "react-native";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import {
   ArrowLeft,
   Mail,
@@ -32,6 +32,9 @@ const COLORS = {
 };
 
 export default function LoginPatientScreen() {
+  const { intent } = useLocalSearchParams<{ intent?: string }>();
+  const bookingIntent =
+    intent === "automatic" || intent === "choose" ? intent : undefined;
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -156,6 +159,7 @@ export default function LoginPatientScreen() {
                 !canLogin && styles.loginButtonDisabled,
               ]}
               disabled={!canLogin}
+              accessibilityRole="button"
               onPress={handleLogin}
             >
               <Text style={styles.loginButtonText}>
@@ -172,8 +176,15 @@ export default function LoginPatientScreen() {
             <Text style={styles.signupText}>{"Don't have an account? "}</Text>
 
             <Pressable
+              accessibilityRole="link"
+              accessibilityLabel="Create a patient account"
               style={styles.signupLinkRow}
-              onPress={() => router.push("/auth/choose-role" as any)}
+              onPress={() =>
+                router.push({
+                  pathname: "/auth/signup-patient",
+                  params: bookingIntent ? { intent: bookingIntent } : {},
+                })
+              }
             >
               <Text style={styles.signupLink}>Sign Up</Text>
               <ChevronRight size={18} color={COLORS.teal} strokeWidth={2.5} />

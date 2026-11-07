@@ -19,8 +19,15 @@ export type Registration = {
   agreed_to_terms: boolean;
   license_number?: string;
   specialty?: string;
+  services?: string[];
   experience?: string;
   service_area?: string;
+  coverage?: {
+    label: string;
+    latitude: number;
+    longitude: number;
+    radius_km: number;
+  };
 };
 type Tokens = { access: string; refresh?: string; user: Account };
 const storageKey = "physiohome.refresh";
@@ -249,4 +256,9 @@ export function accountDestination(account: Account) {
   )
     return "/physiotherapist/home" as const;
   return "/auth/verification-pending" as const;
+}
+
+// Public location lookup is needed before account registration; it contains no session data.
+export function publicApiRequest<T>(path: string): Promise<T> {
+  return request<T>(path);
 }

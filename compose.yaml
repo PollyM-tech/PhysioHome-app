@@ -26,5 +26,20 @@ services:
     depends_on:
       db:
         condition: service_healthy
+  patient-worker:
+    restart: unless-stopped
+    profiles: ["patient-worker"]
+    build: ./backend
+    command: ["python", "manage.py", "patient_worker"]
+    env_file: backend/.env
+    environment:
+      DJANGO_SETTINGS_MODULE: config.settings.development
+      POSTGRES_HOST: db
+      POSTGRES_PORT: "5432"
+    volumes:
+      - ./backend:/app
+    depends_on:
+      db:
+        condition: service_healthy
 volumes:
   physiohome_postgres:

@@ -251,6 +251,14 @@ export default function PhysioProfileScreen() {
             />
           </View>
 
+          <Pressable
+            onPress={() => router.push("/coverage")}
+            style={s.logoutCard}
+          >
+            <Text style={{ color: "#087F83", fontSize: 16 }}>
+              Manage service area and availability
+            </Text>
+          </Pressable>
           {/* ── Log Out ── */}
           <Pressable style={s.logoutCard} onPress={handleLogout}>
             <View style={s.logoutIconWrap}>

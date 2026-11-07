@@ -37,7 +37,16 @@
         }
       ],
       "expo-font",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Allow PhysioHome to use your location to choose a service area or home-visit address."
+        }
+      ],
+      "@react-native-community/datetimepicker",
+      "expo-notifications",
+      "expo-document-picker"
     ],
     "experiments": {
       "typedRoutes": true,

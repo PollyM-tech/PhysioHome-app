@@ -26,7 +26,7 @@ class ProviderApplicationAdmin(admin.ModelAdmin):
     list_display = ("user", "license_number", "verification_status", "reviewed_at")
     list_filter = ("verification_status",)
     search_fields = ("user__email", "user__full_name", "license_number")
-    readonly_fields = ("user", "license_number", "specialty", "experience", "service_area", "verification_status", "reviewed_by", "reviewed_at")
+    readonly_fields = ("user", "license_number", "specialty", "services", "experience", "service_area", "verification_status", "reviewed_by", "reviewed_at", "pricing_reviewed_at", "pricing_reviewed_by")
     actions = ("approve", "reject", "suspend")
 
     def has_view_permission(self, request, obj=None):
@@ -40,6 +40,14 @@ class ProviderApplicationAdmin(admin.ModelAdmin):
 
     def has_change_permission(self, request, obj=None):
         return request.user.role == User.Role.ADMIN and super().has_change_permission(request, obj)
+
+    def save_model(self, request, obj, form, change):
+        with transaction.atomic():
+            User.objects.select_for_update(no_key=True).get(pk=obj.user_id)
+            if {"pricing_tier", "consultant_fee"}.intersection(form.changed_data):
+                obj.pricing_reviewed_by = request.user
+                obj.pricing_reviewed_at = timezone.now() if obj.pricing_tier else None
+            super().save_model(request, obj, form, change)
 
     def review(self, request, queryset, status):
         if not self.has_change_permission(request):

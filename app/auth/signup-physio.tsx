@@ -1,3 +1,9 @@
+import ServiceCheckboxes from "@/components/marketplace/ServiceCheckboxes";
+import { SERVICE_OPTIONS } from "@/lib/marketplace/services";
+import LocationPicker, {
+  RadiusPicker,
+} from "@/components/location/LocationPicker";
+import { Place } from "@/lib/marketplace/api";
 import { register } from "@/lib/auth/client";
 import React, { useMemo, useState } from "react";
 import {
@@ -17,9 +23,7 @@ import {
   Phone,
   Mail,
   BadgeCheck,
-  BriefcaseMedical,
   CalendarDays,
-  MapPin,
   Lock,
   Eye,
   EyeOff,
@@ -45,19 +49,6 @@ const COLORS = {
   error: "#E53E3E",
   black: "#111827",
 };
-
-const SPECIALTIES = [
-  "Spine & Back Therapy",
-  "Sports Injury & Rehabilitation",
-  "Knee & Joint Therapy",
-  "Neurological Rehabilitation",
-  "Elderly & Mobility Care",
-  "Post-Surgery Recovery",
-  "Pediatric Physiotherapy",
-  "Women's Health Physiotherapy",
-  "Cardiopulmonary Rehabilitation",
-  "General Physiotherapy",
-];
 
 const EXPERIENCE_OPTIONS = [
   "Less than 1 year",
@@ -233,9 +224,10 @@ export default function SignupPhysioScreen() {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [licenseNumber, setLicenseNumber] = useState("");
-  const [specialty, setSpecialty] = useState("");
+  const [services, setServices] = useState<string[]>([]);
   const [experience, setExperience] = useState("");
-  const [serviceArea, setServiceArea] = useState("");
+  const [serviceArea, setServiceArea] = useState<Place | null>(null);
+  const [radius, setRadius] = useState(10);
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
@@ -267,16 +259,17 @@ export default function SignupPhysioScreen() {
     phone.trim().length > 0 &&
     email.trim().length > 0 &&
     licenseNumber.trim().length > 0 &&
-    specialty.trim().length > 0 &&
+    services.length >= 1 &&
+    services.length <= 3 &&
     experience.trim().length > 0 &&
-    serviceArea.trim().length > 0 &&
+    serviceArea !== null &&
     passwordIsValid &&
     confirmPassword.length > 0 &&
     password === confirmPassword &&
     agreed;
 
   const handleSignup = async () => {
-    if (!canSubmit) return;
+    if (!canSubmit || !serviceArea) return;
     setBusy(true);
     setError("");
     try {
@@ -288,9 +281,10 @@ export default function SignupPhysioScreen() {
         role: "physiotherapist",
         agreed_to_terms: agreed,
         license_number: licenseNumber.trim(),
-        specialty,
+        services,
         experience,
-        service_area: serviceArea.trim(),
+        service_area: serviceArea.label,
+        coverage: { ...serviceArea, radius_km: radius },
       });
     } catch (err) {
       setError(
@@ -384,20 +378,14 @@ export default function SignupPhysioScreen() {
               Example: KPC/2025/12345 — issued by Kenya Physiotherapists Council
             </Text>
 
-            <DropdownField
-              label="Specialty"
-              placeholder="Select your specialty"
-              value={specialty}
-              options={SPECIALTIES}
-              onSelect={setSpecialty}
-              icon={
-                <BriefcaseMedical
-                  size={20}
-                  color={COLORS.slate}
-                  strokeWidth={2}
-                />
-              }
-            />
+            <View style={{ gap: 12, marginBottom: 16 }}>
+              <Text style={styles.fieldLabel}>Services you offer</Text>
+              <ServiceCheckboxes
+                options={SERVICE_OPTIONS}
+                selected={services}
+                onChange={setServices}
+              />
+            </View>
 
             <DropdownField
               label="Years of Experience"
@@ -410,14 +398,23 @@ export default function SignupPhysioScreen() {
               }
             />
 
-            <InputField
-              label="Service Area / Location"
-              placeholder="Enter your service area"
-              value={serviceArea}
-              onChangeText={setServiceArea}
-              icon={<MapPin size={20} color={COLORS.slate} strokeWidth={2} />}
-              autoCapitalize="words"
-            />
+            <View style={{ gap: 14, marginBottom: 20 }}>
+              <Text style={styles.fieldLabel}>Service Area / Location</Text>
+              <Text style={{ fontSize: 16, color: COLORS.navy }}>
+                Choose where you want to receive home-visit requests, then
+                confirm your travel radius.
+              </Text>
+              <LocationPicker
+                value={serviceArea}
+                onChange={setServiceArea}
+                radiusKm={radius}
+              />
+              <RadiusPicker value={radius} onChange={setRadius} />
+              <Text style={{ color: COLORS.slate }}>
+                Your account starts offline. After approval, choose when to
+                receive requests in your availability settings.
+              </Text>
+            </View>
 
             <InputField
               label="Password"
@@ -524,8 +521,8 @@ export default function SignupPhysioScreen() {
                 style={{ marginTop: 1 }}
               />
               <Text style={styles.verificationNoteText}>
-                Your professional credentials must be reviewed before you can
-                receive bookings. before your profile goes live.
+                Your professional credentials must be reviewed before your
+                profile can receive bookings.
               </Text>
             </View>
           </View>

@@ -4,7 +4,7 @@ Implemented with Django password authentication, Django REST Framework and Simpl
 
 ## Public account flows
 
-Patients and physiotherapists can register using full name, email, phone, password, selected role and terms agreement. Provider registration also saves license number, specialty, experience and service area in a pending provider application. Registration does not verify a phone number, email address or professional license.
+Patients and physiotherapists can register using full name, email, phone, password, selected role and terms agreement. Provider registration also saves license number, one to three offered services and experience in a pending provider application, and requires confirmed geographic coverage (`coverage`: label, latitude, longitude, radius_km). Coverage always starts offline. See [booking and matching](BOOKING_AND_MATCHING.md). Registration does not verify a phone number, email address or professional license.
 
 Email is normalized to lowercase; phone numbers are validated and normalized to E.164, with Kenya as the default region for national numbers. Non-empty emails are unique without regard to case, and normalized non-empty phone numbers are unique at database level. Admin username login remains available separately. Public users cannot assign staff/superuser privileges, request an admin role or approve themselves.
 

@@ -1,3 +1,4 @@
+import { router } from "expo-router";
 import React, { useState } from "react";
 import { SafeAreaView, View, Text, Pressable, StyleSheet } from "react-native";
 import { ShieldCheck } from "lucide-react-native";
@@ -43,6 +44,12 @@ export default function VerificationPendingScreen() {
             {error}
           </Text>
         ) : null}
+        <Pressable
+          onPress={() => router.push("/coverage")}
+          style={{ padding: 16 }}
+        >
+          <Text style={{ color: "#087F83" }}>Manage service area</Text>
+        </Pressable>
         <Pressable
           disabled={busy}
           onPress={() => void check()}

@@ -1,3 +1,4 @@
+import PushRouter from "@/components/push/PushRouter";
 import { RoleGuard } from "@/components/auth/RoleGuard";
 import { Tabs } from "expo-router";
 import { Home, CalendarDays, MessageCircle, User } from "lucide-react-native";
@@ -5,6 +6,7 @@ import { Home, CalendarDays, MessageCircle, User } from "lucide-react-native";
 export default function PatientLayout() {
   return (
     <RoleGuard role="patient">
+      <PushRouter />
       <Tabs
         screenOptions={{
           headerShown: false,
@@ -24,6 +26,15 @@ export default function PatientLayout() {
           },
         }}
       >
+        <Tabs.Screen name="settings" options={{ href: null }} />
+        <Tabs.Screen name="locations" options={{ href: null }} />
+        <Tabs.Screen name="support" options={{ href: null }} />
+        <Tabs.Screen name="privacy" options={{ href: null }} />
+        <Tabs.Screen name="payments" options={{ href: null }} />
+        <Tabs.Screen
+          name="notifications"
+          options={{ title: "Notifications", href: null }}
+        />
         <Tabs.Screen
           name="home"
           options={{

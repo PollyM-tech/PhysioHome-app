@@ -54,3 +54,5 @@ htmlcov/
 backend/.env
 backend/staticfiles/
 backend/media/
+
+backend/private_uploads/

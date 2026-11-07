@@ -2,7 +2,7 @@
 
 Decision date: 6 November 2026
 
-Status: Django foundation and authentication implemented; booking and payment features pending.
+Status: Django authentication, coverage/matching, patient profiles, private booking chat, appointment progress/rescheduling/reviews and push outbox implemented. M-Pesa STK Push selected (Paybill 4125123, PhysioHome); reviewed pricing and disabled-by-default STK integration implemented; credentials, sandbox verification and refund operations pending; device push credentials/build verification and routing remain pending. See [patient feature status](PATIENT_FEATURES.md).
 
 This is the authoritative technology reference. It supersedes Convex-specific guidance in the original product specification, especially sections 21–25 and 30. Product scope, user journeys, business rules, security expectations, and brand guidelines remain applicable.
 
@@ -158,3 +158,7 @@ The brand guideline is unchanged. The product PDF includes a revision notice dir
 - [PostGIS](https://postgis.net/documentation/)
 
 Versioned Django references explain the architecture; they do not pin the implementation version.
+
+## Booking experience revision — 7 November 2026
+
+The primary booking flow automatically finds an eligible available physiotherapist. Direct provider selection remains supported. Provider coverage is a confirmed geographic center plus travel radius, separate from availability and current GPS position. [Booking and matching](BOOKING_AND_MATCHING.md) supersedes earlier provider-first, free-text coverage and random-dispatch assumptions. The web map uses attributed OpenStreetMap tiles; mobile uses platform maps. Full place lookup uses configured Google Places credentials, with a limited Kenya-area directory and manual pins/GPS available without credentials. External routing remains separate.

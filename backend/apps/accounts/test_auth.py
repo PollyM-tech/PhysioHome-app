@@ -75,7 +75,7 @@ class AuthAPITests(TestCase):
 
     def test_provider_details_required_and_status_is_always_pending(self):
         self.assertEqual(self.signup(role="physiotherapist").status_code, 400)
-        response = self.signup(role="physiotherapist", license_number="TEST-123", specialty="General", experience="3 - 5 years", service_area="Nairobi", verification_status="approved")
+        response = self.signup(role="physiotherapist", license_number="TEST-123", specialty="General Physiotherapy", experience="3 - 5 years", service_area="Nairobi", coverage={"label": "Nairobi", "latitude": -1.2921, "longitude": 36.8219, "radius_km": 10}, verification_status="approved")
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data["user"]["verification_status"], "pending")
         self.assertEqual(ProviderApplication.objects.get().verification_status, "pending")

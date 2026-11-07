@@ -1,0 +1,33 @@
+from django.urls import path
+from . import locations, views, patient_tools, patient_account, workflow, chat, payments
+
+urlpatterns = [
+    path("payments/mpesa/", payments.list_payments),
+    path("payments/mpesa/<uuid:payment_id>/", payments.payment_status),
+    path("payments/mpesa/callback/<uuid:payment_id>/<str:token>/", payments.callback),
+    path("bookings/<uuid:booking_id>/pay/", payments.initiate),
+    path("patient/profile/", patient_account.profile),
+    path("patient/password/", patient_account.password),
+    path("patient/locations/", patient_account.locations),
+    path("patient/support/", patient_account.support),
+    path("patient/push/", patient_account.push_preferences),
+    path("conversations/", chat.conversations),
+    path("bookings/<uuid:booking_id>/messages/", chat.messages),
+    path("bookings/<uuid:booking_id>/messages/search/", chat.search_messages),
+    path("bookings/<uuid:booking_id>/messages/<uuid:message_id>/attachment/", chat.attachment),
+    path("bookings/<uuid:booking_id>/reschedule/", workflow.reschedule),
+    path("bookings/<uuid:booking_id>/reschedule/<str:action>/", workflow.respond_reschedule),
+    path("bookings/<uuid:booking_id>/progress/<str:action>/", workflow.progress),
+    path("bookings/<uuid:booking_id>/review/", workflow.review),
+    path("locations/search/", locations.search_places),
+    path("catalog/", views.catalogue),
+    path("services/search/", patient_tools.search_services),
+    path("notifications/", patient_tools.notifications),
+    path("notifications/read/", patient_tools.read_notifications),
+    path("provider/coverage/", views.provider_coverage),
+    path("providers/discover/", views.discover),
+    path("bookings/", views.bookings),
+    path("bookings/<uuid:booking_id>/cancel/", views.cancel_booking),
+    path("provider/offers/", views.offers),
+    path("provider/offers/<int:offer_id>/<str:action>/", views.respond_offer),
+]
